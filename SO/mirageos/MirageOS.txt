@@ -1,0 +1,58 @@
+Información general está disponible en: [www.detachedsolutions.com/mirageos/](http://www.detachedsolutions.com/mirageos/)
+El Manual de Usuario está disponible en: [www.detachedsolutions.com/mirageos/manual/](http://www.detachedsolutions.com/mirageos/manual/)
+Para ayuda con la instalación ve a: [www.detachedsolutions.com/mirageos/manual/install.php](http://www.detachedsolutions.com/mirageos/manual/install.php)
+Información para desarrolladores está en: [www.detachedsolutions.com/mirageos/develop/](http://www.detachedsolutions.com/mirageos/develop/)
+
+Por favor, lee la documentación en línea y el manual de usuario antes de ejecutar MirageOS.
+Cualquier pregunta o comentario puede ser enviado a: mirage@detachedsolutions.com
+
+Lista de cambios desde la versión 1.1:
+Problemas/Solución de errores:
+- Los programas en BASIC funcionan en todas las combinaciones de hardware/sistema operativo.
+- La visualización del tamaño de las carpetas puede ser mayor que 65535 bytes.
+- El número de programas no se desborda más allá de 127.
+- El Key hook no destruye OP1.
+- Se corrigió un error de interrupción USB en la 84 Plus.
+- Se corrigió un posible error con on+del.
+- No detecta programas ! o #.
+- Puede APD después de un fallo en la transmisión del enlace.
+- La visualización del archivo libre es lo suficientemente grande como para mostrar la memoria libre de SE.
+- El token prgm se muestra correctamente en las descripciones de los programas en BASIC.
+- Apagar la calculadora funciona mejor en SE.
+- La dirección web apunta al lugar correcto.
+- Otras correcciones varias.
+
+Nuevas Adiciones/Cambios:
+- La ordenación es mucho más rápida.
+- Smart writeback solo escribe de vuelta al archivo si los programas se modifican.
+- Nueva tecla de tarea on+^ para salir inmediatamente sin escribir de vuelta.
+- Algunas funciones se ejecutan a 15 mhz en calculadoras compatibles.
+- Puede cancelar los mensajes de renombrar/nueva carpeta.
+- Se eliminó la emulación de 82.
+
+Lista de cambios desde la versión 1.0:
+
+Problemas/Solución de errores:
+- Ya no se bloquea en la pantalla de gráficos, se corrigieron los Key Hooks del sistema.
+- El archivo/desarchivo de programas funciona en condiciones de RAM/ROM baja.
+- La ordenación de programas funciona correctamente para dos programas con el mismo nombre.
+- Los programas en BASIC se ejecutan correctamente (Texto antes de Input, Menús, etc.).
+- Se corrigió el Key Hook de Alpha+ON, ya no desordena la calculadora cuando se inserta el cable de enlace durante este método de apagado.
+- Se corrigió la vinculación y transferencia de programas.
+- Presionar ON para interrumpir durante los menús de BASIC ya no tiene problemas.
+- Se mejoró la emulación de TI-82 y se corrigió un error de carga de emulación.
+- Los programas ocultos ya no se desordenan cuando se elimina una carpeta.
+- El apagado automático (APD) se corrigió en los programas de Mirage que usan APD.
+
+Nuevas Adiciones/Cambios:
+- Se eliminaron todos los métodos de ordenación excepto la ordenación por nombre de programa.
+- Se implementó una nueva función para "Ocultar Todo" los programas.
+- Se reorganizó el contenido de la barra de funciones en el Administrador de Programas:
+  1.) El menú de ordenación ahora se llama "Actn" (que significa Acción), que contiene las dos funciones para ordenar carpetas y mover todos los programas.
+  2.) El menú de información para programas ahora tiene la selección "Todo" que se usa para la función de Ocultar Todo.
+- Se añadieron teclas de acceso rápido al Administrador de Programas para un fácil acceso a varias funciones, y las combinaciones de teclas son las siguientes:
+  DEL = Eliminar programa/carpeta, MATH = Nueva carpeta, APPS = Renombrar programa/carpeta, PRGM = Ocultar Todo, VARS = Mostrar RAM/ROM libre, X-1 = Ordenar carpeta, SIN = Archivar programa, COS = Ocultar programa, TAN = Bloquear/Desbloquear programa, STO = Mover programa/Mover todos los programas.
+- Varias de estas funciones ahora se pueden acceder desde el menú de carpetas, al usar otra GUI.
+- La rutina de entrada para nombres de programas y carpetas se ha cambiado para usar la tecla ALPHA para alternar entre letras y números, en lugar del uso anterior de la tecla ON para cambiar de modo.
+- Los Key Hooks no están activos en la pantalla de gráficos, como Alpha+ON, Alpha+APPS, y repetición rápida de teclas, pero proteger el menú de memoria sigue funcionando correctamente desde cualquier lugar en la calculadora.
+- El mensaje de ordenación ahora se muestra en la pantalla cuando el shell está ordenando programas. A veces esto puede tomar un tiempo, y no queremos que los usuarios piensen que su calculadora se ha bloqueado al iniciar MirageOS o al ordenar programas manualmente desde el Administrador de Programas.
