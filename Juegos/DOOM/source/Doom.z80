@@ -1,0 +1,324 @@
+;-------------=D O O M  8 3=--------------
+
+;Doom83 est un jeu en 3D pour ti-83(+)
+;Il utilise pour afficher les murs et les
+;items un algorithme situé à mi chemin
+;entre le raycastinc et les vrais moteurs
+;3D on utilise des rayons pour trouver
+;les points à afficher, mais on les affiche
+;avec de vraies formules de 3D...
+;par Raphaël Siryani et Alexis GUINAMARD.
+
+;-------------=D O O M  8 3=--------------
+
+
+;-------=Définition des variables=-------
+
+#define codetouche	saferam1
+#define xperso_v 	codetouche+1		;variables
+#define zperso_v 	xperso_v+2	
+#define xpersovieux	zperso_v+2
+#define zpersovieux 	xpersovieux+2
+
+#define xperso 		zpersovieux+2
+#define zperso 		xperso+2
+#define anglerayon 	zperso+2
+#define dx 		anglerayon+1
+#define dz 		dx+1
+#define xray 		dz+1
+#define zray 		xray+1
+#define S 		zray+1
+#define xperso_e	S+1
+#define zperso_e	xperso_e+1
+#define numrayon	zperso_e+1
+
+#define	increment	numrayon+1
+#define	variationx	increment+1
+#define	variationz	variationx+2
+#define	orientation	variationz+2
+#define	dimention	orientation+1
+#define	varE		dimention+1
+#define	anposmur	varE+2
+#define	tempsmur	anposmur+2
+#define	orientation2	tempsmur+2
+#define	anposmur2	orientation2+1
+#define	tempcoo		anposmur2+2
+#define	vardepl		tempcoo+2
+#define	n_sprite	vardepl+1
+#define	n_spritea	n_sprite+1
+#define	compteurinterrup n_spritea+1
+#define	spritetemp	compteurinterrup+1
+#define	sp-2		spritetemp+1
+#define	matnum		sp-2+2
+#define	tempsprite	matnum+1
+#define	spritenum	tempsprite+2
+#define	tire		spritenum+1
+#define	tempxt		tire+1
+#define tempmonstre	tempxt+1
+#define tempadsp	tempmonstre+2
+#define puissance	tempadsp+2
+#define nmonstres	puissance+1
+#define munitionsv	nmonstres+1
+#define indexia		munitionsv+1
+#define	placelibrepointer indexia+1
+#define	tempreturn	placelibrepointer+2
+#define	tempcouille	tempreturn+2
+#define	vie		tempcouille+1
+#define niveau		vie+1
+#define cont		niveau+1
+#define nmenu		cont+1
+#define moptions	nmenu+1
+
+;------------=Header=------------
+	.nolist		
+	#include "ion.inc"
+	.list
+#ifdef TI83P	
+#define interrupt_table		$9900			;valeurs utilisées pour
+#define interrupt_table2	$99			;la routine d'interruption
+#define interrupt		$9A
+#define interrupt_adresse	$9A9A
+	
+	.org	$9d93
+	.db	$BB,$6D
+	ret
+	.db	1
+	
+	.db	%00000000,%00000000
+	.db	%10000000,%00000000
+	.db	%01000000,%00000000
+	.db	%00100000,%01111111
+	.db	%00110000,%11000100
+	.db	%00101111,%11000100
+	.db	%00101001,%01000100
+	.db	%00101001,%01000100
+	.db	%00101001,%01000100
+	.db	%00101111,%01000100
+	.db	%00110000,%11000100
+	.db	%00100000,%01111111
+	.db	%01000000,%00000000
+	.db	%10000000,%00000000
+	.db	%00000000,%00000000
+	.db "Doom pour ti83+!",0
+#else		
+	.org progstart
+
+#define interrupt_table		$8300
+#define interrupt_table2	$83
+#define interrupt		$84
+#define interrupt_adresse	$8484
+
+		
+	xor	a
+	jr nc,initialisation
+	.db "Doom pour ti83!",0
+#endif
+:----------=Programme=-----------
+
+initialisation:
+	#include "menu.inc"			;menu principal
+	
+jeu_init:
+	#include "init.inc"			;initialisations diverses
+		
+boucle_principalle:
+	xor	a
+	ld	(dimention),a
+	ld	(n_sprite),a
+	ld	(n_spritea),a
+	
+	bcall(_cleargbuf)
+	
+	ld	a,(tire)
+	dec	a
+	
+	jp	m,idle
+	jp	p,feu
+
+
+suitebp:	
+
+	call	rayons				;lance la routine de tracé de rayons
+	call	calculdesmurs			;lance la routine d'affichage
+
+	ld	a,$40
+	out	($10),a		
+	ld	a,80
+	ld	l,0
+	ld	b,64
+	ld	c,2
+	ld	ix,barredevie
+	call	largesprite2
+	
+	ld	a,(vie)
+	ld	b,77
+	ld	c,8
+	call	affiche_a
+	ld	a,(munitionsv)
+	ld	b,77
+	ld	c,26
+	call	affiche_a
+
+	call	fastcopy
+
+	ld	a,0FFh
+	out	(1),a
+	ld	a,0fdh
+	out	(1),a
+	in	a,(1)		
+	cp	191
+	jp	z,quitter			;quitter [CLEAR]	
+
+
+;/////////////////////////////////////////
+ia_tirer:
+	ld	hl,ia_identliste
+	xor	a
+	ld	b,11
+	
+ia_tirerboucle:
+	cp	(hl)
+	jp	nz,monstrechecktirer
+suiteiatirerboucle:
+	inc	hl
+	djnz	ia_tirerboucle
+	jp	boucle_principalle
+
+monstrechecktirer:
+	ld	a,r
+	cp	245
+	jp	m,tirermonstre
+	;ld	de,spritemonstre-ia_identliste
+	;xor	a
+	;add	hl,de
+	;ld	(hl),a
+	jp	suiteiatirerboucle
+
+tirermonstre:
+	ld	a,(vie)
+	dec	a
+	jp	z,perdu
+	ld	(vie),a
+	ld	a,$42
+	out	($10),a
+	;ld	de,spritemonstre-ia_identliste
+	;xor	a
+	;add	hl,de
+	;ld	(hl),a
+	jp	suiteiatirerboucle
+
+perdu:
+	im	1
+	bcall(_clrlcdf)
+	ld	hl,4
+	ld	(currow),hl
+	ld	(curcol),hl
+	ld	hl,perdutxt
+	bcall(_puts)
+	call	temporisateur
+	ld	sp,(sp-2)
+	pop	hl
+	ld	hl,(tempreturn)
+	push	hl
+	ret
+;////////////////////////////////////////
+
+
+
+
+idle:
+	cp	-10
+	jp	m,idlecinq
+	ld	(tire),a
+	xor	a
+	ld	(puissance),a	
+idle2:
+	ld	a,33
+	ld	l,46
+	ld	b,18
+	ld	c,2
+	ld	ix,pistol
+	call	largesprite
+	jp	suitebp
+
+idlecinq:
+	ld	a,-11
+	ld	(tire),a
+	jp	idle2
+
+feu:
+	ld	(tire),a
+feu2:
+	ld	a,27				;seulement une sprite :}
+	ld	l,38
+	ld	b,26
+	ld	c,3
+	ld	ix,pistol2
+	call	largesprite
+	jp	suitebp
+
+
+
+
+gagné2:
+	im	1
+	ld	a,(niveau)
+	cp	3
+	jp	m,nouveau_monde
+	ld	hl,04
+	ld	(currow),hl
+	ld	(curcol),hl
+	ld	hl,gagnét
+	bcall(_puts)
+	call	temporisateur
+	ld	sp,(sp-2)
+	pop	hl
+	ld	hl,(tempreturn)
+	push	hl
+	ret
+
+quitter:
+	ld	a,(cont)
+	add	a,216
+	out	($10),a
+	im	1
+	ld	sp,(sp-2)
+	pop	hl
+	ld	hl,(tempreturn)
+	push	hl
+	jp	bouclemenu
+
+quit:
+	bcall(_clrlcdf)
+	ld	hl,04
+	ld	(currow),hl
+	ld	(curcol),hl	
+	ld	hl,quittexte
+	bcall(_puts)
+	ld	sp,(sp-2)
+	pop	hl
+	ld	hl,(tempreturn)
+	push	hl
+	ret
+
+	#include "nvmonde.inc"
+	#include "depl.inc"
+	#include "rayons4.inc"			;différentes routines  et données du jeu
+	#include "affi1.inc" 
+	#include "afficha.inc"
+	#include "sprtrtns.inc"
+	#include "lineclip.inc" 
+	#include "linedraw.inc" 
+	#include "tableaux.inc"
+	#include "monde.inc"
+	#include "sprites.inc"
+	
+
+quittexte:
+	.db "Au revoir!",0
+perdutxt:
+	.db "Perdu :(",0
+niveau4:
+	.db "NIVEAU 4!",0
+
+.end
